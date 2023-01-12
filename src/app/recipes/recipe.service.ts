@@ -1,27 +1,31 @@
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
-import { Injectable } from '@angular/core';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
-import { Subject } from 'rxjs';
 
 @Injectable()
 export class RecipeService {
+  recipesChanged = new Subject<Recipe[]>();
+
   private recipes: Recipe[] = [
     new Recipe(
-      'Hot Dog',
-      'super tasty',
-      'https://media.istockphoto.com/id/1146404440/vector/hot-dog-with-mustard-hand-drawing.jpg?s=612x612&w=0&k=20&c=b4tmD8q4AClUIQZF5zjto04VW9LTyqzgpt8HuFUGuVM=',
-      [new Ingredient('Ketchup', 1), new Ingredient('Sausage', 1)]
+      'Monster Burger',
+      'Big Fat Awesome',
+      'https://jf-staeulalia.pt/img/other/18/collection-burgers-cliparts-2.png',
+      [new Ingredient('Meat', 2), new Ingredient('French Fries', 20)]
     ),
     new Recipe(
-      'Big Fat Burger',
-      'just awesome',
-      'https://jf-staeulalia.pt/img/other/18/collection-burgers-cliparts-2.png',
-      [new Ingredient('Buns', 2), new Ingredient('Meat', 1)]
+      'Hot Dog',
+      'Super Tasty',
+      'https://media.istockphoto.com/id/1146404440/vector/hot-dog-with-mustard-hand-drawing.jpg?s=612x612&w=0&k=20&c=b4tmD8q4AClUIQZF5zjto04VW9LTyqzgpt8HuFUGuVM=',
+      [new Ingredient('Sausage', 1), new Ingredient('Ketchup', 2)]
     ),
   ];
 
   constructor(private slService: ShoppingListService) {}
+
   getRecipes() {
     return this.recipes.slice();
   }
@@ -32,5 +36,20 @@ export class RecipeService {
 
   addIngredientsToShoppingList(ingredients: Ingredient[]) {
     this.slService.addIngredients(ingredients);
+  }
+
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  updateRecipe(index: number, newRecipe: Recipe) {
+    this.recipes[index] = newRecipe;
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  deleteRecipe(index: number) {
+    this.recipes.splice(index, 1);
+    this.recipesChanged.next(this.recipes.slice());
   }
 }
